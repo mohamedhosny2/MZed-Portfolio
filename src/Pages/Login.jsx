@@ -7,6 +7,8 @@ export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const [recoveryLoading, setRecoveryLoading] = useState(false)
+  const [recoveryMessage, setRecoveryMessage] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const navigate = useNavigate()
 
@@ -28,6 +30,23 @@ export default function Login() {
       return
     }
     navigate('/dashboard')
+  }
+
+  const handlePasswordRecovery = async () => {
+    const normalizedEmail = email.trim()
+    if (!normalizedEmail) {
+      setRecoveryMessage('اكتب بريدك الإلكتروني أولًا، ثم اضغط نسيت كلمة المرور.')
+      return
+    }
+
+    setRecoveryLoading(true)
+    setRecoveryMessage('')
+    const redirectTo = `${window.location.origin}${import.meta.env.BASE_URL}set-password`
+    const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, { redirectTo })
+    setRecoveryLoading(false)
+    setRecoveryMessage(error
+      ? error.message
+      : 'لو البريد مسجل، هيوصلك رابط لاستعادة كلمة المرور. راجع Inbox وSpam.')
   }
 
   return (
@@ -89,6 +108,18 @@ export default function Login() {
                   </button>
                 </div>
               </div>
+
+              <div className="text-right">
+                <button
+                  type="button"
+                  onClick={handlePasswordRecovery}
+                  disabled={recoveryLoading}
+                  className="text-xs text-indigo-300 hover:text-violet-200 disabled:opacity-60"
+                >
+                  {recoveryLoading ? 'جاري إرسال الرابط...' : 'نسيت كلمة المرور؟'}
+                </button>
+              </div>
+              {recoveryMessage && <p role="status" className="text-center text-xs text-violet-200">{recoveryMessage}</p>}
 
               <button type="submit" disabled={loading} className="relative group/btn w-full mt-1">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-[#4f52c9] to-[#8644c5] rounded-xl opacity-70 blur group-hover/btn:opacity-100 transition duration-300" />
