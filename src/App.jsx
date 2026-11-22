@@ -19,6 +19,7 @@ const ContactPage = lazy(() => import("./Pages/Contact"));
 const ProjectDetails = lazy(() => import("./components/ProjectDetail"));
 const WelcomeScreen = lazy(() => import("./Pages/WelcomeScreen"));
 const NotFoundPage = lazy(() => import("./Pages/404"));
+const SetPassword = lazy(() => import("./Pages/SetPassword"));
 
 const LandingPage = ({ showWelcome, setShowWelcome }) => {
   return (
@@ -84,6 +85,7 @@ function App() {
 
           {/* AUTH */}
           <Route path="/login" element={<Login />} />
+          <Route path="/set-password" element={<SetPassword />} />
 
           {/* ADMIN (PROTECTED) */}
           <Route
