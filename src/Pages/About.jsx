@@ -37,7 +37,7 @@ const AboutPage = () => {
           Reliable service, thoughtful analysis, and clear communication.
         </div>
         <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:justify-center lg:justify-start">
-          <a href="/Mohamed-Abdelzaher.pdf" download className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 px-6 py-3 font-semibold text-white shadow-lg shadow-indigo-900/30 transition hover:brightness-110"><FileText size={18}/>Download CV</a>
+          <a href={`${import.meta.env.BASE_URL}Mohamed-Abdelzaher.pdf`} download className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 px-6 py-3 font-semibold text-white shadow-lg shadow-indigo-900/30 transition hover:brightness-110"><FileText size={18}/>Download CV</a>
           <a href="#Portofolio" className="inline-flex items-center justify-center gap-2 rounded-xl border border-violet-400/40 px-6 py-3 font-semibold text-violet-300 transition hover:bg-violet-400/10"><Code size={18}/>View Projects</a>
         </div>
       </div>
@@ -45,7 +45,7 @@ const AboutPage = () => {
         <div className="relative">
           <div className="absolute -inset-6 rounded-full bg-gradient-to-br from-indigo-500/30 via-purple-500/20 to-cyan-400/20 blur-2xl" />
           <div className="relative h-72 w-72 overflow-hidden rounded-full border-4 border-white/20 shadow-[0_0_50px_rgba(120,119,198,0.25)] sm:h-96 sm:w-96">
-            <img src="/Mohamed-Abdelzaher.jpg" alt="Mohamed Abdelzaher" className="h-full w-full object-cover object-center" />
+            <img src={`${import.meta.env.BASE_URL}Mohamed-Abdelzaher.jpg`} alt="Mohamed Abdelzaher" className="h-full w-full object-cover object-center" />
           </div>
         </div>
       </div>
