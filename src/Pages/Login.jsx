@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { supabase } from "../supabase";
-import { useNavigate } from 'react-router-dom'
+import { isSupabaseConfigured, supabase } from "../supabase";
+import { Navigate, useNavigate } from 'react-router-dom'
 import { Mail, Lock, LogIn, Sparkles, Eye, EyeOff } from 'lucide-react'
 
 export default function Login() {
@@ -9,6 +9,8 @@ export default function Login() {
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const navigate = useNavigate()
+
+  if (!isSupabaseConfigured) return <Navigate to="/" replace />
 
   const handleLogin = async (e) => {
     e.preventDefault()
