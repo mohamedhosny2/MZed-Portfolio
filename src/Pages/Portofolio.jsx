@@ -13,6 +13,8 @@ import CardProject from "../components/CardProject";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import { Code, Award, Boxes } from "lucide-react";
+import { useSiteContent } from "../context/SiteContentContext";
+import { isSupabaseConfigured, supabase } from "../supabase";
 
 
 const ToggleButton = ({ onClick, isShowingMore }) => (
@@ -105,13 +107,13 @@ const cvProjects = [
   { Title: "Recipe Sharing Platform", Description: "A project included in the CV. Demo and further project details are not provided." },
   { Title: "Java Tank Game", Description: "A project included in the CV. Demo and further project details are not provided." },
 ];
-const cvCertificates = ["Claude 101", "IT Masters Diploma — Route Academy", "WordPress — Coursera", "AWS Cloud Practitioner — In Progress"];
 
 export default function FullWidthTabs() {
+  const { content } = useSiteContent();
   const theme = useTheme();
   const [value, setValue] = useState(0);
-  const [projects] = useState(cvProjects);
-  const [certificates] = useState(cvCertificates);
+  const [projects, setProjects] = useState(cvProjects);
+  const [certificates, setCertificates] = useState(content.certifications.map((Title, id) => ({ id, Title })));
   const [showAllProjects, setShowAllProjects] = useState(false);
   const [showAllCertificates, setShowAllCertificates] = useState(false);
   const isMobile = window.innerWidth < 768;
@@ -119,6 +121,20 @@ export default function FullWidthTabs() {
 
   useEffect(() => {
     AOS.init({ once: true });
+  }, []);
+
+  useEffect(() => {
+    if (!isSupabaseConfigured) return;
+    let active = true;
+    Promise.all([
+      supabase.from("projects").select("id,Title,Description,Img,Link").eq("is_published", true).order("order_index").order("created_at", { ascending: false }),
+      supabase.from("certificates").select("id,Title,Img").order("created_at", { ascending: false }),
+    ]).then(([p, c]) => {
+      if (!active) return;
+      if (!p.error) setProjects(p.data || []);
+      if (!c.error) setCertificates(c.data || []);
+    });
+    return () => { active = false; };
   }, []);
 
   const handleChange = (event, newValue) => {
@@ -288,7 +304,7 @@ export default function FullWidthTabs() {
                     data-aos={index % 3 === 0 ? "fade-up-right" : index % 3 === 1 ? "fade-up" : "fade-up-left"}
                     data-aos-duration={index % 3 === 0 ? "1000" : index % 3 === 1 ? "1200" : "1000"}
                   >
-                    <div className="min-h-24 rounded-2xl border border-white/10 bg-white/[0.04] p-5 text-center text-slate-200 grid place-items-center">{certificate}</div>
+                    <div className="min-h-24 rounded-2xl border border-white/10 bg-white/[0.04] p-5 text-center text-slate-200 grid place-items-center">{typeof certificate === "string" ? certificate : <div><p>{certificate.Title}</p>{certificate.Img && <a className="mt-2 inline-block text-xs text-violet-300" href={certificate.Img} target="_blank" rel="noreferrer">View certificate</a>}</div>}</div>
                   </div>
                 ))}
               </div>
@@ -306,7 +322,7 @@ export default function FullWidthTabs() {
           <TabPanel value={value} index={2} dir={theme.direction}>
             <div className="container mx-auto flex justify-center items-center overflow-hidden pb-[5%]">
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 lg:gap-8 gap-5">
-                {techStacks.map((stack, index) => (
+                {(content.skills.length ? content.skills : techStacks).map((stack, index) => (
                   <div
                     key={index}
                     data-aos={index % 3 === 0 ? "fade-up-right" : index % 3 === 1 ? "fade-up" : "fade-up-left"}

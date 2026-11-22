@@ -3,12 +3,14 @@ import { Share2, User, Mail, MessageSquare, Send } from "lucide-react";
 import SocialLinks from "../components/SocialLinks";
 import Komentar from "../components/Commentar";
 import { isSupabaseConfigured } from "../supabase";
+import { useSiteContent } from "../context/SiteContentContext";
 import Swal from "sweetalert2";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import axios from "axios";
 
 const ContactPage = () => {
+  const { content } = useSiteContent();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -45,7 +47,7 @@ const ContactPage = () => {
 
     try {
       // Deliver contact form submissions to the CV email
-      const formSubmitUrl = 'https://formsubmit.co/mohamedhosny2819@gmail.com';
+      const formSubmitUrl = `https://formsubmit.co/${content.about.email}`;
       
       // Siapkan data form untuk FormSubmit
       const submitData = new FormData();
@@ -125,7 +127,7 @@ const ContactPage = () => {
               WebkitTextFillColor: "transparent",
             }}
           >
-            Contact Me
+          {content.contact.title}
           </span>
         </h2>
         <p
@@ -133,7 +135,7 @@ const ContactPage = () => {
           data-aos-duration="1100"
           className="text-slate-400 max-w-2xl mx-auto text-sm md:text-base mt-2"
         >
-          Have a question or opportunity? Send a message and I will get back to you.
+          {content.contact.subtitle}
         </p>
       </div>
 
@@ -149,10 +151,10 @@ const ContactPage = () => {
             <div className="flex justify-between items-start mb-8">
               <div>
                 <h2 className="text-4xl font-bold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-[#6366f1] to-[#a855f7]">
-                  Hubungi
+                  {content.contact.cardTitle}
                 </h2>
                 <p className="text-gray-400">
-                  Discuss a support role, project, or collaboration.
+                  {content.contact.cardSubtitle}
                 </p>
               </div>
               <Share2 className="w-10 h-10 text-[#6366f1] opacity-50" />
@@ -220,7 +222,7 @@ const ContactPage = () => {
                 className="w-full bg-gradient-to-r from-[#6366f1] to-[#a855f7] text-white py-4 rounded-xl font-semibold transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-[#6366f1]/20 active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 <Send className="w-5 h-5" />
-                {isSubmitting ? 'Sending...' : 'Send Message'}
+                {isSubmitting ? 'Sending...' : content.contact.sendButton}
               </button>
             </form>
 
@@ -229,11 +231,9 @@ const ContactPage = () => {
             </div>
           </div>
 
-          {isSupabaseConfigured && (
-            <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-3 py-3 md:p-10 md:py-8 shadow-2xl transform transition-all duration-500 hover:shadow-[#6366f1]/10">
-              <Komentar />
-            </div>
-          )}
+          <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-3 py-3 md:p-10 md:py-8 shadow-2xl transform transition-all duration-500 hover:shadow-[#6366f1]/10">
+            {isSupabaseConfigured ? <Komentar /> : <div className="grid min-h-80 place-items-center rounded-2xl border border-white/10 bg-[#0d0b20] p-8 text-center"><div><MessageSquare className="mx-auto mb-4 h-10 w-10 text-violet-400"/><h3 className="text-xl font-semibold text-white">Comments</h3><p className="mt-2 max-w-sm text-sm text-slate-400">قسم التعليقات موجود، وهينشط بمجرد توصيل إعدادات Supabase.</p></div></div>}
+          </div>
         </div>
       </div>
     </div>

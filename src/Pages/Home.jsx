@@ -1,28 +1,35 @@
-import { useState, useEffect, useCallback, memo } from "react"
+import { useState, useEffect, useCallback, memo, useMemo } from "react"
 import { Helmet } from "react-helmet-async"
-import { Linkedin, Mail, ExternalLink } from "lucide-react"
+import { Mail, ExternalLink } from "lucide-react"
 import AOS from 'aos'
 import 'aos/dist/aos.css'
+import { useSiteContent } from "../context/SiteContentContext"
+import { publicAsset } from "../utils/publicAsset"
+import SocialLinks from "../components/SocialLinks"
 
-const MainTitle = memo(() => (
+const MainTitle = memo(({ title }) => {
+  const [firstLine, ...rest] = (title || "").split("\n");
+  const secondLine = rest.join(" ");
+  return (
   <div className="space-y-2" data-aos="fade-up" data-aos-delay="600">
     <h1 className="text-5xl sm:text-6xl md:text-6xl lg:text-6xl xl:text-7xl font-bold tracking-tight">
       <span className="relative inline-block">
         <span className="absolute -inset-2 bg-gradient-to-r from-[#6366f1] to-[#a855f7] blur-2xl opacity-20"></span>
         <span className="relative bg-gradient-to-r from-white via-blue-100 to-purple-200 bg-clip-text text-transparent">
-          Application
+          {firstLine}
         </span>
       </span>
       <br />
       <span className="relative inline-block mt-2">
         <span className="absolute -inset-2 bg-gradient-to-r from-[#6366f1] to-[#a855f7] blur-2xl opacity-20"></span>
         <span className="relative bg-gradient-to-r from-[#6366f1] to-[#a855f7] bg-clip-text text-transparent">
-          Support Engineer
+          {secondLine}
         </span>
       </span>
     </h1>
   </div>
-));
+  );
+});
 
 const TechStack = memo(({ tech }) => (
   <div className="px-4 py-2 hidden sm:block rounded-full bg-white/5 backdrop-blur-sm border border-white/10 text-sm text-gray-300 hover:bg-white/10 transition-colors">
@@ -47,29 +54,13 @@ const CTAButton = memo(({ href, text, icon: Icon }) => (
   </a>
 ));
 
-const SocialLink = memo(({ icon: Icon, link, label }) => (
-  <a href={link} target="_blank" rel="noopener noreferrer" aria-label={label}>
-    <button className="group relative p-3"
-      aria-label={label}>
-      <div className="absolute inset-0 bg-gradient-to-r from-[#6366f1] to-[#a855f7] rounded-xl blur opacity-20 group-hover:opacity-40 transition duration-300"></div>
-      <div className="relative rounded-xl bg-black/50 backdrop-blur-xl p-2 flex items-center justify-center border border-white/10 group-hover:border-white/20 transition-all duration-300">
-        <Icon className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
-      </div>
-    </button>
-  </a>
-));
-
 const TYPING_SPEED = 100;
 const ERASING_SPEED = 50;
 const PAUSE_DURATION = 2000;
-const WORDS = ["Banking Applications", "Production Support", "AI Workflow Automation"];
-const TECH_STACK = ["SQL / PL-SQL", "IIS & ETL", "KYC / AML / CFT", "L2 / L3 Support"];
-const SOCIAL_LINKS = [
-  { icon: Linkedin, link: "https://www.linkedin.com/in/mohamed-hosny28", label: "LinkedIn Profile" },
-  { icon: Mail, link: "mailto:mohamedhosny2819@gmail.com", label: "Email Mohamed" }
-];
 
 const Home = () => {
+  const { content } = useSiteContent();
+  const words = useMemo(() => content.home.rotatingTitles.length ? content.home.rotatingTitles : [""], [content.home.rotatingTitles]);
   const [text, setText] = useState("")
   const [isTyping, setIsTyping] = useState(true)
   const [wordIndex, setWordIndex] = useState(0)
@@ -96,9 +87,10 @@ const Home = () => {
   }, []);
 
   const handleTyping = useCallback(() => {
+    if (!words[0]) return;
     if (isTyping) {
-      if (charIndex < WORDS[wordIndex].length) {
-        setText(prev => prev + WORDS[wordIndex][charIndex]);
+      if (charIndex < words[wordIndex % words.length].length) {
+        setText(prev => prev + words[wordIndex % words.length][charIndex]);
         setCharIndex(prev => prev + 1);
       } else {
         setTimeout(() => setIsTyping(false), PAUSE_DURATION);
@@ -108,11 +100,11 @@ const Home = () => {
         setText(prev => prev.slice(0, -1));
         setCharIndex(prev => prev - 1);
       } else {
-        setWordIndex(prev => (prev + 1) % WORDS.length);
+        setWordIndex(prev => (prev + 1) % words.length);
         setIsTyping(true);
       }
     }
-  }, [charIndex, isTyping, wordIndex]);
+  }, [charIndex, isTyping, wordIndex, words]);
 
   useEffect(() => {
     const timeout = setTimeout(
@@ -143,7 +135,7 @@ const Home = () => {
                 data-aos="fade-right"
                 data-aos-delay="200">
                 <div className="space-y-4 sm:space-y-6">
-                  <MainTitle />
+                  <MainTitle title={content.home.title} />
 
                   {/* Typing Effect */}
                   <div className="h-8 flex items-center" data-aos="fade-up" data-aos-delay="800">
@@ -157,27 +149,25 @@ const Home = () => {
                   <p className="text-base md:text-lg text-gray-400 max-w-xl leading-relaxed font-light"
                     data-aos="fade-up"
                     data-aos-delay="1000">
-                    Senior Application Support Engineer experienced in enterprise banking platforms, incident management, deployments, UAT, and production reliability.
+                    {content.home.description}
                   </p>
 
                   {/* Tech Stack */}
                   <div className="flex flex-wrap gap-3 justify-start" data-aos="fade-up" data-aos-delay="1200">
-                    {TECH_STACK.map((tech, index) => (
+                    {content.home.techStack.map((tech, index) => (
                       <TechStack key={index} tech={tech} />
                     ))}
                   </div>
 
                   {/* CTA Buttons */}
                   <div className="flex flex-row gap-3 w-full justify-start" data-aos="fade-up" data-aos-delay="1400">
-                    <CTAButton href="#Portofolio" text="Projects" icon={ExternalLink} />
-                    <CTAButton href="#Contact" text="Contact" icon={Mail} />
+                    <CTAButton href="#Portofolio" text={content.home.projectsButton} icon={ExternalLink} />
+                    <CTAButton href="#Contact" text={content.home.contactButton} icon={Mail} />
                   </div>
 
                   {/* Social Links */}
                   <div className="hidden sm:flex gap-4 justify-start" data-aos="fade-up" data-aos-delay="1600">
-                    {SOCIAL_LINKS.map((social, index) => (
-                      <SocialLink key={index} {...social} />
-                    ))}
+                    <SocialLinks compact />
                   </div>
                 </div>
               </div>
@@ -198,7 +188,7 @@ const Home = () => {
                     isHovering ? "scale-105" : "scale-100"
                   }`}>
                     <img
-                      src="Animation1.gif"
+                      src={publicAsset(content.home.animationUrl)}
                       alt="Support Engineer Animation"
                       className={`w-full h-full object-contain transition-all duration-500 ${
                         isHovering 

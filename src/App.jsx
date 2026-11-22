@@ -12,6 +12,7 @@ import Footer from "./components/Footer";
 import Login from "./Pages/Login";
 import Dashboard from "./Pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { SiteContentProvider } from "./context/SiteContentContext";
 
 const Portofolio = lazy(() => import("./Pages/Portofolio"));
 const ContactPage = lazy(() => import("./Pages/Contact"));
@@ -62,6 +63,7 @@ function App() {
   return (
     
     <HelmetProvider>
+      <SiteContentProvider>
       <div className="pointer-events-none">
   <AnimatedBackground />
 </div>
@@ -104,6 +106,7 @@ function App() {
           />
         </Routes>
       </BrowserRouter>
+      </SiteContentProvider>
     </HelmetProvider>
   );
 }

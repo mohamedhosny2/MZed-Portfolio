@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
+import { useSiteContent } from "../context/SiteContentContext";
 
 const navItems = [
     { href: "#Home", label: "Home" },
@@ -9,6 +10,7 @@ const navItems = [
 ];
 
 const Navbar = () => {
+    const { content } = useSiteContent();
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [activeSection, setActiveSection] = useState("Home");
@@ -84,7 +86,7 @@ const Navbar = () => {
                             onClick={(e) => scrollToSection(e, "#Home")}
                             className="text-xl font-bold bg-gradient-to-r from-[#a855f7] to-[#6366f1] bg-clip-text text-transparent"
                         >
-                            M.Zed
+                            {content.brandName}
                         </a>
                     </div>
         
